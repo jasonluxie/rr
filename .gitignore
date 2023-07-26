@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 #api-keys
-api_key.json
+.env
