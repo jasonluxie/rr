@@ -12,7 +12,6 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Search />} />
-                    {/* <Route path="/result" element={Result} /> */}
                 </Routes>
             </BrowserRouter>
         </>
