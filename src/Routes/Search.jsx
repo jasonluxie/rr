@@ -13,7 +13,7 @@ const Search = () => {
     }
 
     async function workerPing(latitude, longitude) {
-        const response = await fetch("https://rr.jasonluxie.workers.dev/?lat=" + latitude +"&lng=" +longitude);
+        const response = await fetch("https://rr.jasonluxie.workers.dev/?lat=" + latitude +"&lng=" + longitude);
         const restaurants = await response.json();
         console.log(restaurants);
       }
