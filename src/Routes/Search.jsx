@@ -1,13 +1,23 @@
-import { useRef, useEffect } from "react";
-
 const Search = () => {
+    function success(pos) {
+        const crd = pos.coords;
+        workerPing(pos.coords.latitude, pos.coords.longitude)
+    }
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+    };
+    function getLocation() {
+        navigator.geolocation.getCurrentPosition(success, null, options);
+    }
 
-    async function workerPing() {
-        const response = await fetch("https://rr.jasonluxie.workers.dev/?lat=2&long=2");
+    async function workerPing(latitude, longitude) {
+        const response = await fetch("https://rr.jasonluxie.workers.dev/?lat=" + latitude +"&lng=" +longitude);
         const restaurants = await response.json();
         console.log(restaurants);
       }
-
+    
     return (
         <div>
             <h1>Restaurant Royale</h1>
@@ -15,7 +25,7 @@ const Search = () => {
                 id="initBtn"
                 type="button"
                 value="Boop"
-                onClick={workerPing}
+                onClick={getLocation}
             />
         </div>
     );
