@@ -2,7 +2,6 @@ import { useState } from "react";
 
 function Results(restaurants) {
     const [restaurant, setRestaurant] = useState(restaurants);
-    console.log(restaurant)
     let encodedName = encodeURI(restaurant.data.name)
     return (
         <div>
