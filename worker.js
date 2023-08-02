@@ -24,28 +24,17 @@ export default {
             const { headers } = response;
             const contentType = headers.get("content-type") || "";
             if (contentType.includes("application/json")) {
-                return JSON.stringify(await response.json());
+                return chooseRes(await response.json())
             }
             return response.text();
         }
-        async function cleanData(object) {
-            let randomNumber =
-                object.projects[
-                    Math.floor(Math.random() * mapObject.projects.length)
-                ];
-            let chosenRestaurant = object.projects[randomNumber];
-            return {
-                name: chosenRestaurant.name,
-                lat: chosenRestaurant.geometry.location.lat,
-                lng: chosenRestaurant.geometry.location.lng,
-                photo: chosenRestaurant.photos.photo_reference,
-                place_id: chosenRestaurant.place_id,
-            };
+        function chooseRes (object) {
+            let chosenRes = object.results[Math.floor(Math.random()*object.results.length)]
+            return JSON.stringify(chosenRes)
         }
-
         const mapsResponse = await fetch(url, init);
         let mapObject = await gatherResponse(mapsResponse);
-        // let cleanedData = await cleanData(mapObject);
+
         response.body = mapObject;
         return new Response(response.body, {
             headers: responseHeaders,
