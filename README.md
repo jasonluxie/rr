@@ -13,3 +13,6 @@ Studying cloudflare  workers to make a random restaurant chooser in a radius aro
 - google maps photo api
 - radio options for maps query (type of restaurant etc.)
 - rating option
+
+## Notes
+App is currently not deployed as worker is off 
