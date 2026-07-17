@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>" />
-    <title>Restaurant Roulette | Spin to Decide Your Next Meal</title>
+    <title>Restaurant Roulette</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,10 +45,11 @@
 
         .app-container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 900px;
             padding: 2.5rem 1.5rem;
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 2.5rem;
         }
 
@@ -57,36 +58,23 @@
         }
 
         .logo {
-            font-size: 3rem;
+            font-size: 3.2rem;
             font-weight: 800;
             background: linear-gradient(to right, #ff3366, #ff9933, #00f2fe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 0 0 0.5rem 0;
-            letter-spacing: -1px;
+            margin: 0;
+            letter-spacing: -1.5px;
             filter: drop-shadow(0 2px 10px rgba(255, 51, 102, 0.25));
         }
 
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin: 0;
-            font-weight: 500;
-        }
-
-        /* Main Workspace layout */
+        /* Restructured Layout: Centered column */
         .main-content {
-            display: grid;
-            grid-template-columns: 1.25fr 1.75fr;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             gap: 2.5rem;
-            align-items: start;
-        }
-
-        @media (max-width: 900px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
+            width: 100%;
         }
 
         .card {
@@ -99,15 +87,133 @@
             box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.45);
         }
 
+        /* Wheel Panel Layout (Top Focus) */
+        .wheel-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 480px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.65), 
+                        0 0 35px rgba(255, 51, 102, 0.1);
+            background: #110d22;
+            transition: box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .wheel-container.spinning #wheel-canvas {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 
+                        0 0 45px rgba(0, 242, 254, 0.35),
+                        0 0 80px rgba(255, 51, 102, 0.25);
+        }
+
+        /* Top Pointer Triangle */
+        .wheel-pointer {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 35px solid #ff3366;
+            filter: drop-shadow(0 4px 6px rgba(255, 51, 102, 0.5));
+            z-index: 10;
+        }
+
+        /* Center Spin Button Overlay */
+        .spin-btn-center {
+            position: absolute;
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            border: 4px solid #19142b;
+            background: var(--spin-btn-gradient);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(240, 47, 194, 0.5), 
+                        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 8;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+
+        .spin-btn-center:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(240, 47, 194, 0.75),
+                        inset 0 3px 6px rgba(255, 255, 255, 0.5);
+        }
+
+        .spin-btn-center:active:not(:disabled) {
+            transform: scale(0.95);
+            box-shadow: 0 3px 10px rgba(240, 47, 194, 0.5);
+        }
+
+        .spin-btn-center:disabled {
+            background: linear-gradient(135deg, #2b2438 0%, #1a1523 100%);
+            color: var(--text-muted);
+            border-color: #120f18;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Controls Layout (Side-by-side underneath the wheel) */
+        .controls-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+        }
+
+        @media (max-width: 700px) {
+            .controls-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
         .side-panel {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
 
-        .side-panel h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 1.4rem;
+        .setup-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .setup-card h3 {
+            margin: 0;
+            font-size: 1.3rem;
             font-weight: 700;
             background: linear-gradient(to right, #ffffff, #c2b5d7);
             -webkit-background-clip: text;
@@ -126,7 +232,7 @@
             color: var(--text-muted);
         }
 
-        .input-group input[type="url"] {
+        .input-group input[type="text"] {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--card-border);
             border-radius: 10px;
@@ -135,9 +241,10 @@
             font-family: inherit;
             font-size: 0.95rem;
             transition: all 0.3s ease;
+            width: 100%;
         }
 
-        .input-group input[type="url"]:focus {
+        .input-group input[type="text"]:focus {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
@@ -220,10 +327,6 @@
             cursor: not-allowed;
         }
 
-        .btn-full {
-            width: 100%;
-        }
-
         /* Status box styling */
         .status-box {
             display: flex;
@@ -255,7 +358,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
-            margin-top: 0.5rem;
+            height: 100%;
         }
 
         .restaurants-list-container h4 {
@@ -281,7 +384,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 240px;
+            height: 250px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -324,7 +427,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 170px;
+            max-width: 200px;
         }
 
         .restaurants-list li .rating {
@@ -341,97 +444,6 @@
             font-style: italic;
             background: transparent !important;
             border: none !important;
-        }
-
-        /* Wheel Panel Layout */
-        .wheel-panel {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 480px;
-        }
-
-        .wheel-container {
-            position: relative;
-            width: 100%;
-            max-width: 480px;
-            aspect-ratio: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #wheel-canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.65), 
-                        0 0 35px rgba(255, 51, 102, 0.1);
-            background: #110d22;
-            transition: box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .wheel-container.spinning #wheel-canvas {
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 
-                        0 0 45px rgba(0, 242, 254, 0.35),
-                        0 0 80px rgba(255, 51, 102, 0.25);
-        }
-
-        /* Top Pointer Triangle */
-        .wheel-pointer {
-            position: absolute;
-            top: -16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 35px solid #ff3366;
-            filter: drop-shadow(0 4px 6px rgba(255, 51, 102, 0.5));
-            z-index: 10;
-        }
-
-        /* Center Spin Button Overlay */
-        .spin-btn-center {
-            position: absolute;
-            width: 86px;
-            height: 86px;
-            border-radius: 50%;
-            border: 4px solid #19142b;
-            background: var(--spin-btn-gradient);
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 1.15rem;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(240, 47, 194, 0.5), 
-                        inset 0 2px 4px rgba(255, 255, 255, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 8;
-            outline: none;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            user-select: none;
-        }
-
-        .spin-btn-center:hover:not(:disabled) {
-            transform: scale(1.08);
-            box-shadow: 0 8px 25px rgba(240, 47, 194, 0.75),
-                        inset 0 3px 6px rgba(255, 255, 255, 0.5);
-        }
-
-        .spin-btn-center:active:not(:disabled) {
-            transform: scale(0.95);
-            box-shadow: 0 3px 10px rgba(240, 47, 194, 0.5);
-        }
-
-        .spin-btn-center:disabled {
-            background: linear-gradient(135deg, #2b2438 0%, #1a1523 100%);
-            color: var(--text-muted);
-            border-color: #120f18;
-            box-shadow: none;
-            cursor: not-allowed;
         }
 
         /* Result Modal Backdrop */
@@ -644,53 +656,13 @@
         <!-- App Title and Header -->
         <header>
             <h1 class="logo">Restaurant Roulette</h1>
-            <p class="subtitle">Decide where to eat, instantly and deterministically.</p>
         </header>
 
         <!-- Main Interface Grid -->
         <div class="main-content">
             
-            <!-- Settings panel (inputs and restaurant list) -->
-            <div class="side-panel card">
-                <h3>Roulette Setup</h3>
-                
-                <div class="input-group">
-                    <label for="worker-url-input">Cloudflare Worker URL</label>
-                    <input type="url" id="worker-url-input" placeholder="https://your-worker-name.subdomain.workers.dev">
-                    <small>Provide your deployed Worker URL. Frontend coordinates are securely passed to it.</small>
-                </div>
-
-                <div class="slider-container">
-                    <label for="radius-slider" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
-                        Search Radius: <span id="radius-val" style="color: var(--accent-color); font-weight: 700;">5</span> miles
-                    </label>
-                    <input type="range" id="radius-slider" min="1" max="25" value="5">
-                </div>
-
-                <button id="fetch-btn" class="btn btn-primary">
-                    <span>📍</span> Get Local Restaurants
-                </button>
-
-                <!-- Status indicator -->
-                <div class="status-box" id="status-box" style="display: none;">
-                    <div class="status-spinner"></div>
-                    <span id="status-text">Acquiring location...</span>
-                </div>
-
-                <!-- List of loaded restaurants -->
-                <div class="restaurants-list-container">
-                    <h4>
-                        <span>Wheel Slices</span>
-                        <span class="badge" id="restaurant-count">0</span>
-                    </h4>
-                    <ul class="restaurants-list" id="restaurants-list">
-                        <li class="empty-list">No restaurants loaded yet. Configure your URL above and click the button to retrieve data.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Animated Canvas Wheel Panel -->
-            <div class="wheel-panel card">
+            <!-- Animated Canvas Wheel Panel (Centered Focus) -->
+            <div class="wheel-panel">
                 <div class="wheel-container">
                     <!-- Triangle Pointer -->
                     <div class="wheel-pointer"></div>
@@ -700,6 +672,50 @@
                     
                     <!-- Center SPIN trigger -->
                     <button id="spin-btn" class="spin-btn-center" disabled>SPIN</button>
+                </div>
+            </div>
+
+            <!-- Controls (Placed Underneath) -->
+            <div class="controls-content">
+                <!-- Setup Card -->
+                <div class="side-panel card setup-card">
+                    <h3>Roulette Setup</h3>
+                    
+                    <div class="input-group">
+                        <label for="location-input">Custom Location (Optional)</label>
+                        <input type="text" id="location-input" placeholder="e.g. Chicago, IL or 60601">
+                        <small>Leave empty to use your browser's live GPS location.</small>
+                    </div>
+
+                    <div class="slider-container">
+                        <label for="radius-slider" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
+                            Search Radius: <span id="radius-val" style="color: var(--accent-color); font-weight: 700;">5</span> miles
+                        </label>
+                        <input type="range" id="radius-slider" min="1" max="25" value="5">
+                    </div>
+
+                    <button id="fetch-btn" class="btn btn-primary">
+                        <span>📍</span> Get Local Restaurants
+                    </button>
+
+                    <!-- Status indicator -->
+                    <div class="status-box" id="status-box" style="display: none;">
+                        <div class="status-spinner"></div>
+                        <span id="status-text">Acquiring location...</span>
+                    </div>
+                </div>
+
+                <!-- List of loaded restaurants -->
+                <div class="side-panel card">
+                    <div class="restaurants-list-container">
+                        <h4>
+                            <span>Wheel Slices</span>
+                            <span class="badge" id="restaurant-count">0</span>
+                        </h4>
+                        <ul class="restaurants-list" id="restaurants-list">
+                            <li class="empty-list">No restaurants loaded yet. Click the button on the left to retrieve local spots.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -750,7 +766,7 @@
 
     <script>
         // DOM Elements
-        const workerUrlInput = document.getElementById('worker-url-input');
+        const locationInput = document.getElementById('location-input');
         const radiusSlider = document.getElementById('radius-slider');
         const radiusVal = document.getElementById('radius-val');
         const fetchBtn = document.getElementById('fetch-btn');
@@ -797,16 +813,6 @@
             '#b5179e', // Orchid Purple
             '#4cc9f0'  // Sky Cyan
         ];
-
-        // Load persisted Worker URL from localStorage on startup
-        if (localStorage.getItem('rr_worker_url')) {
-            workerUrlInput.value = localStorage.getItem('rr_worker_url');
-        }
-
-        // Save Worker URL when changed
-        workerUrlInput.addEventListener('change', () => {
-            localStorage.setItem('rr_worker_url', workerUrlInput.value.trim());
-        });
 
         // Update radius text representation dynamically
         radiusSlider.addEventListener('input', () => {
@@ -965,111 +971,139 @@
 
         // Fetch location and load restaurants
         fetchBtn.addEventListener('click', () => {
-            const workerUrl = workerUrlInput.value.trim();
-            if (!workerUrl) {
-                showToast('Please enter your Cloudflare Worker URL in the settings panel first.', 'warning');
-                return;
-            }
+            const customLocation = locationInput.value.trim();
 
             // Reset frontend state
             fetchBtn.disabled = true;
             statusBox.style.display = 'flex';
-            statusText.textContent = 'Acquiring geolocation details...';
             restaurantsList.innerHTML = '';
             restaurantCount.textContent = '0';
             restaurants = [];
             drawWheel();
             spinBtn.disabled = true;
 
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
+            // Convert miles to meters (1 mile = 1609.34 meters)
+            const radiusMeters = Math.round(radiusSlider.value * 1609.34);
+
+            if (customLocation) {
+                statusText.textContent = 'Geocoding search location...';
+
+                // Query free OpenStreetMap Nominatim API for custom location resolution
+                const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(customLocation)}&format=json&limit=1`;
+                
+                fetch(geocodeUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error('Geocoding service returned an error.');
+                    return res.json();
+                })
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        throw new Error('Location not found. Try entering a city name or zip code.');
+                    }
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
                     
-                    // Convert miles to meters (1 mile = 1609.34 meters)
-                    const radiusMeters = Math.round(radiusSlider.value * 1609.34);
-
-                    statusText.textContent = 'Connecting to Cloudflare Worker...';
-
-                    try {
-                        const baseUrl = workerUrl.endsWith('/') ? workerUrl : `${workerUrl}/`;
-                        const fetchUrl = `${baseUrl}?lat=${lat}&lng=${lng}&radius=${radiusMeters}`;
-                        
-                        const response = await fetch(fetchUrl);
-
-                        if (!response.ok) {
-                            const errorPayload = await response.json().catch(() => ({}));
-                            throw new Error(errorPayload.error || `Server HTTP Error: ${response.status}`);
-                        }
-
-                        const data = await response.json();
-
-                        if (!data.results || !Array.isArray(data.results)) {
-                            throw new Error('Unexpected response structure from Google Places API.');
-                        }
-
-                        // Filter businesses with rating count >= 5 to bypass spam/ghost locations
-                        const validRestaurants = data.results.filter(b => (b.user_ratings_total || 0) >= 5);
-
-                        // Skips wheel animation if no restaurants match, displays CSS toast alert
-                        if (validRestaurants.length === 0) {
-                            showToast('No restaurants match your filters! Try widening your search area.', 'warning');
-                            statusBox.style.display = 'none';
-                            fetchBtn.disabled = false;
-                            return;
-                        }
-
-                        // Limit to maximum 12 items for wheel readability
-                        restaurants = validRestaurants.slice(0, 12);
-                        restaurantCount.textContent = restaurants.length;
-
-                        // Render side list items
-                        restaurants.forEach(r => {
-                            const li = document.createElement('li');
-                            
-                            const nameSpan = document.createElement('span');
-                            nameSpan.className = 'name';
-                            nameSpan.textContent = r.name;
-                            
-                            const ratingSpan = document.createElement('span');
-                            ratingSpan.className = 'rating';
-                            ratingSpan.textContent = `★ ${(r.rating || 0).toFixed(1)}`;
-                            
-                            li.appendChild(nameSpan);
-                            li.appendChild(ratingSpan);
-                            restaurantsList.appendChild(li);
-                        });
-
-                        showToast(`Successfully loaded ${restaurants.length} restaurants!`, 'info');
-                        
-                        drawWheel();
-                        spinBtn.disabled = false;
-
-                    } catch (error) {
-                        console.error(error);
-                        showToast(`Failed loading data: ${error.message}`, 'warning');
-                    } finally {
-                        statusBox.style.display = 'none';
-                        fetchBtn.disabled = false;
-                    }
-                },
-                (locationError) => {
-                    console.error(locationError);
-                    let message = 'Unable to determine coordinates.';
-                    if (locationError.code === locationError.PERMISSION_DENIED) {
-                        message = 'Location access was denied. Please grant geolocation permissions.';
-                    }
-                    showToast(message, 'warning');
+                    fetchRestaurants(lat, lng, radiusMeters);
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast(err.message, 'warning');
                     statusBox.style.display = 'none';
                     fetchBtn.disabled = false;
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 8000,
-                    maximumAge: 0
-                }
-            );
+                });
+
+            } else {
+                statusText.textContent = 'Acquiring GPS coordinates...';
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        fetchRestaurants(lat, lng, radiusMeters);
+                    },
+                    (locationError) => {
+                        console.error(locationError);
+                        let message = 'Unable to determine coordinates.';
+                        if (locationError.code === locationError.PERMISSION_DENIED) {
+                            message = 'Location access was denied. Please enter a custom location above or grant permissions.';
+                        }
+                        showToast(message, 'warning');
+                        statusBox.style.display = 'none';
+                        fetchBtn.disabled = false;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 0
+                    }
+                );
+            }
         });
+
+        // Core API Fetch Execution
+        async function fetchRestaurants(lat, lng, radiusMeters) {
+            statusText.textContent = 'Fetching local dining spots...';
+
+            try {
+                const fetchUrl = `/api?lat=${lat}&lng=${lng}&radius=${radiusMeters}`;
+                const response = await fetch(fetchUrl);
+
+                if (!response.ok) {
+                    const errorPayload = await response.json().catch(() => ({}));
+                    throw new Error(errorPayload.error || `Server HTTP Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.results || !Array.isArray(data.results)) {
+                    throw new Error('Unexpected response structure from Google Places API.');
+                }
+
+                // Filter businesses with rating count >= 5 to bypass spam/ghost locations
+                const validRestaurants = data.results.filter(b => (b.user_ratings_total || 0) >= 5);
+
+                // Skips wheel animation if no restaurants match, displays CSS toast alert
+                if (validRestaurants.length === 0) {
+                    showToast('No restaurants match your filters! Try widening your search area.', 'warning');
+                    statusBox.style.display = 'none';
+                    fetchBtn.disabled = false;
+                    return;
+                }
+
+                // Limit to maximum 12 items for wheel readability
+                restaurants = validRestaurants.slice(0, 12);
+                restaurantCount.textContent = restaurants.length;
+
+                // Render list items
+                restaurants.forEach(r => {
+                    const li = document.createElement('li');
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'name';
+                    nameSpan.textContent = r.name;
+                    
+                    const ratingSpan = document.createElement('span');
+                    ratingSpan.className = 'rating';
+                    ratingSpan.textContent = `★ ${(r.rating || 0).toFixed(1)}`;
+                    
+                    li.appendChild(nameSpan);
+                    li.appendChild(ratingSpan);
+                    restaurantsList.appendChild(li);
+                });
+
+                showToast(`Successfully loaded ${restaurants.length} restaurants!`, 'info');
+                
+                drawWheel();
+                spinBtn.disabled = false;
+
+            } catch (error) {
+                console.error(error);
+                showToast(`Failed loading data: ${error.message}`, 'warning');
+            } finally {
+                statusBox.style.display = 'none';
+                fetchBtn.disabled = false;
+            }
+        }
 
         // Smooth physics-based deceleration loop
         function animateWheel() {
