@@ -1,13 +1,1198 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="src\assets\menu.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Restaurant Royale</title>
-    </head>
-    <body>
-        <div id="root"></div>
-        <script type="module" src="/src/main.jsx"></script>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍽️</text></svg>" />
+    <title>Restaurant Roulette | Spin to Decide Your Next Meal</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0d0a16;
+            --bg-gradient: radial-gradient(circle at center, #1c142c 0%, #080610 100%);
+            --card-bg: rgba(22, 17, 39, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --glow-color: #ff3366;
+            --text-color: #f1edf7;
+            --text-muted: #9f96b3;
+            --accent-color: #00f2fe;
+            --accent-gradient: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
+            --btn-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --spin-btn-gradient: linear-gradient(135deg, #f02fc2 0%, #6094ea 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ff3366, #ff9933, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: -1px;
+            filter: drop-shadow(0 2px 10px rgba(255, 51, 102, 0.25));
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Main Workspace layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1.25fr 1.75fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.45);
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .side-panel h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #c2b5d7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .input-group input[type="url"] {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input[type="url"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+        }
+
+        .input-group small {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Radius Slider Custom Styling */
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            outline: none;
+            margin: 10px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-color);
+            transition: transform 0.15s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Buttons styling */
+        .btn {
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.85rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: var(--btn-gradient);
+            color: #04020a;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.45);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Status box styling */
+        .status-box {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.85rem 1.2rem;
+            border-radius: 10px;
+            border: 1px dashed var(--card-border);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .status-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Restaurant lists */
+        .restaurants-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .restaurants-list-container h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .restaurants-list-container h4 .badge {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0.15rem 0.6rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .restaurants-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 240px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .restaurants-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .restaurants-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 3px;
+        }
+
+        .restaurants-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+        }
+
+        .restaurants-list li {
+            padding: 0.7rem 0.9rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .restaurants-list li:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .restaurants-list li .name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 170px;
+        }
+
+        .restaurants-list li .rating {
+            color: #ffeb3b;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+
+        .empty-list {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2.5rem 1rem !important;
+            font-style: italic;
+            background: transparent !important;
+            border: none !important;
+        }
+
+        /* Wheel Panel Layout */
+        .wheel-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 480px;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.65), 
+                        0 0 35px rgba(255, 51, 102, 0.1);
+            background: #110d22;
+            transition: box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .wheel-container.spinning #wheel-canvas {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 
+                        0 0 45px rgba(0, 242, 254, 0.35),
+                        0 0 80px rgba(255, 51, 102, 0.25);
+        }
+
+        /* Top Pointer Triangle */
+        .wheel-pointer {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 35px solid #ff3366;
+            filter: drop-shadow(0 4px 6px rgba(255, 51, 102, 0.5));
+            z-index: 10;
+        }
+
+        /* Center Spin Button Overlay */
+        .spin-btn-center {
+            position: absolute;
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            border: 4px solid #19142b;
+            background: var(--spin-btn-gradient);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.15rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(240, 47, 194, 0.5), 
+                        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 8;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+
+        .spin-btn-center:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(240, 47, 194, 0.75),
+                        inset 0 3px 6px rgba(255, 255, 255, 0.5);
+        }
+
+        .spin-btn-center:active:not(:disabled) {
+            transform: scale(0.95);
+            box-shadow: 0 3px 10px rgba(240, 47, 194, 0.5);
+        }
+
+        .spin-btn-center:disabled {
+            background: linear-gradient(135deg, #2b2438 0%, #1a1523 100%);
+            color: var(--text-muted);
+            border-color: #120f18;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Result Modal Backdrop */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(6, 4, 12, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Modal Box */
+        .modal-card {
+            background: rgba(24, 19, 44, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 440px;
+            padding: 2.5rem;
+            position: relative;
+            transform: scale(0.85);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 
+                        0 0 40px rgba(0, 242, 254, 0.2);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-color);
+        }
+
+        .modal-badge {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: var(--accent-gradient);
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            color: #fff;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+
+        .modal-header h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.3rem;
+        }
+
+        .stars {
+            color: #ffeb3b;
+            font-size: 1.25rem;
+            letter-spacing: 1.5px;
+        }
+
+        .reviews-count {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .restaurant-info {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.3rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .restaurant-info p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .restaurant-info .label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.15rem;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.2rem;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* Toast notifications container */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: rgba(28, 21, 48, 0.95);
+            backdrop-filter: blur(10px);
+            color: var(--text-color);
+            border-left: 4px solid var(--glow-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            padding: 1.1rem 1.3rem;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            line-height: 1.4;
+            pointer-events: auto;
+            animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .toast.warning {
+            border-left-color: #ff9900;
+        }
+
+        .toast.info {
+            border-left-color: var(--accent-color);
+        }
+
+        .toast-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.3rem;
+            padding: 0 0 0 12px;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+
+        .toast-close:hover {
+            color: var(--text-color);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- App Title and Header -->
+        <header>
+            <h1 class="logo">Restaurant Roulette</h1>
+            <p class="subtitle">Decide where to eat, instantly and deterministically.</p>
+        </header>
+
+        <!-- Main Interface Grid -->
+        <div class="main-content">
+            
+            <!-- Settings panel (inputs and restaurant list) -->
+            <div class="side-panel card">
+                <h3>Roulette Setup</h3>
+                
+                <div class="input-group">
+                    <label for="worker-url-input">Cloudflare Worker URL</label>
+                    <input type="url" id="worker-url-input" placeholder="https://your-worker-name.subdomain.workers.dev">
+                    <small>Provide your deployed Worker URL. Frontend coordinates are securely passed to it.</small>
+                </div>
+
+                <div class="slider-container">
+                    <label for="radius-slider" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
+                        Search Radius: <span id="radius-val" style="color: var(--accent-color); font-weight: 700;">5</span> miles
+                    </label>
+                    <input type="range" id="radius-slider" min="1" max="25" value="5">
+                </div>
+
+                <button id="fetch-btn" class="btn btn-primary">
+                    <span>📍</span> Get Local Restaurants
+                </button>
+
+                <!-- Status indicator -->
+                <div class="status-box" id="status-box" style="display: none;">
+                    <div class="status-spinner"></div>
+                    <span id="status-text">Acquiring location...</span>
+                </div>
+
+                <!-- List of loaded restaurants -->
+                <div class="restaurants-list-container">
+                    <h4>
+                        <span>Wheel Slices</span>
+                        <span class="badge" id="restaurant-count">0</span>
+                    </h4>
+                    <ul class="restaurants-list" id="restaurants-list">
+                        <li class="empty-list">No restaurants loaded yet. Configure your URL above and click the button to retrieve data.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Animated Canvas Wheel Panel -->
+            <div class="wheel-panel card">
+                <div class="wheel-container">
+                    <!-- Triangle Pointer -->
+                    <div class="wheel-pointer"></div>
+                    
+                    <!-- Canvas Drawing Area -->
+                    <canvas id="wheel-canvas"></canvas>
+                    
+                    <!-- Center SPIN trigger -->
+                    <button id="spin-btn" class="spin-btn-center" disabled>SPIN</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Result Modal dialog -->
+    <div class="modal-overlay" id="result-modal">
+        <div class="modal-card">
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <span class="modal-badge">🎯 Selected Option</span>
+                <h2 id="modal-title">Golden Dragon Diner</h2>
+            </div>
+            <div class="modal-body">
+                <div class="rating-container">
+                    <span class="stars" id="modal-stars">★★★★☆</span>
+                    <span class="reviews-count" id="modal-reviews">(86 reviews)</span>
+                </div>
+                <div class="restaurant-info">
+                    <div>
+                        <div class="label">Location Address</div>
+                        <p id="modal-address">123 Peking Road, Suite A, San Francisco, CA 94108</p>
+                    </div>
+                    <div>
+                        <div class="label">Contact Info</div>
+                        <p id="modal-phone">Check in Google Maps</p>
+                    </div>
+                    <div>
+                        <div class="label">Categories</div>
+                        <div class="tags-container">
+                            <span class="tag" id="modal-price">$$</span>
+                            <span class="tag" id="modal-category">Chinese</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="modal-maps-link" href="#" target="_blank" class="btn btn-primary btn-full">
+                    🗺️ Navigate in Google Maps
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container for dynamic alerts/toasts -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // DOM Elements
+        const workerUrlInput = document.getElementById('worker-url-input');
+        const radiusSlider = document.getElementById('radius-slider');
+        const radiusVal = document.getElementById('radius-val');
+        const fetchBtn = document.getElementById('fetch-btn');
+        const spinBtn = document.getElementById('spin-btn');
+        const statusBox = document.getElementById('status-box');
+        const statusText = document.getElementById('status-text');
+        const restaurantsList = document.getElementById('restaurants-list');
+        const restaurantCount = document.getElementById('restaurant-count');
+        const canvas = document.getElementById('wheel-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Modal Elements
+        const resultModal = document.getElementById('result-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalTitle = document.getElementById('modal-title');
+        const modalStars = document.getElementById('modal-stars');
+        const modalReviews = document.getElementById('modal-reviews');
+        const modalAddress = document.getElementById('modal-address');
+        const modalPhone = document.getElementById('modal-phone');
+        const modalPrice = document.getElementById('modal-price');
+        const modalCategory = document.getElementById('modal-category');
+        const modalMapsLink = document.getElementById('modal-maps-link');
+
+        // State variables
+        let restaurants = [];
+        let currentAngle = 0;
+        let spinVelocity = 0;
+        let isSpinning = false;
+        const friction = 0.985; // Deceleration constant
+        let animationFrameId = null;
+
+        // Modern, high-contrast, beautiful segment color palette
+        const colors = [
+            '#ff3366', // Deep Coral Pink
+            '#00f2fe', // Electric Cyan
+            '#ff9933', // Sunset Orange
+            '#7f00ff', // Vivid Violet
+            '#39ff14', // Electric Lime
+            '#ff007f', // Deep Rose
+            '#00d2c4', // Clean Mint Teal
+            '#ffeb3b', // Bright Yellow
+            '#4361ee', // Vibrant Indigo Blue
+            '#ff5722', // Hot Chili Orange
+            '#b5179e', // Orchid Purple
+            '#4cc9f0'  // Sky Cyan
+        ];
+
+        // Load persisted Worker URL from localStorage on startup
+        if (localStorage.getItem('rr_worker_url')) {
+            workerUrlInput.value = localStorage.getItem('rr_worker_url');
+        }
+
+        // Save Worker URL when changed
+        workerUrlInput.addEventListener('change', () => {
+            localStorage.setItem('rr_worker_url', workerUrlInput.value.trim());
+        });
+
+        // Update radius text representation dynamically
+        radiusSlider.addEventListener('input', () => {
+            radiusVal.textContent = radiusSlider.value;
+        });
+
+        // Initialize high-DPI canvas parameters
+        function setupCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const size = canvas.clientWidth || 400;
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+            drawWheel();
+        }
+
+        // Handle viewport adjustments dynamically
+        window.addEventListener('resize', setupCanvas);
+
+        // Display a clean, custom CSS toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button class="toast-close" aria-label="Close">&times;</button>
+            `;
+            toastContainer.appendChild(toast);
+
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.remove();
+            });
+
+            // Automatic removal after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.animation = 'slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // Render the roulette wheel contents on the Canvas
+        function drawWheel() {
+            const size = canvas.width / (window.devicePixelRatio || 1);
+            const center = size / 2;
+            const radius = center - 15; // Padding allowance
+
+            ctx.clearRect(0, 0, size, size);
+
+            const total = restaurants.length;
+
+            // Empty state background
+            if (total === 0) {
+                ctx.beginPath();
+                ctx.arc(center, center, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#16122d';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+                ctx.lineWidth = 6;
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#9f96b3';
+                ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Retrieve restaurants to load wheel...', center, center);
+                return;
+            }
+
+            const segmentSize = (2 * Math.PI) / total;
+
+            for (let i = 0; i < total; i++) {
+                const startAngle = i * segmentSize + currentAngle;
+                const endAngle = startAngle + segmentSize;
+
+                // Draw solid segment slice
+                ctx.beginPath();
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, radius, startAngle, endAngle);
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+
+                // Draw crisp border between segments
+                ctx.beginPath();
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, radius, startAngle, endAngle);
+                ctx.strokeStyle = 'rgba(13, 10, 22, 0.35)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Draw restaurant text label in segment
+                ctx.save();
+                ctx.translate(center, center);
+                ctx.rotate(startAngle + segmentSize / 2);
+
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 5;
+                ctx.font = '800 13px "Plus Jakarta Sans", sans-serif';
+
+                // Truncate text labels to prevent visual overflow
+                let displayName = restaurants[i].name;
+                if (displayName.length > 18) {
+                    displayName = displayName.slice(0, 16) + '...';
+                }
+
+                ctx.fillText(displayName, radius - 25, 0);
+                ctx.restore();
+            }
+
+            // Draw border indicators (small aesthetic LED bulbs)
+            for (let i = 0; i < total; i++) {
+                const dotAngle = i * segmentSize + currentAngle;
+                const dotX = center + radius * Math.cos(dotAngle);
+                const dotY = center + radius * Math.sin(dotAngle);
+
+                ctx.beginPath();
+                ctx.arc(dotX, dotY, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = (i % 2 === 0) ? '#ffeb3b' : '#ffffff';
+                ctx.shadowColor = '#ffeb3b';
+                ctx.shadowBlur = (i % 2 === 0) ? 6 : 0;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            }
+
+            // Outer rim dark metallic border
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#251c3c';
+            ctx.lineWidth = 8;
+            ctx.stroke();
+
+            // Center metallic hub
+            ctx.beginPath();
+            ctx.arc(center, center, 44, 0, 2 * Math.PI);
+            const hubGrad = ctx.createRadialGradient(center, center, 5, center, center, 44);
+            hubGrad.addColorStop(0, '#2d234a');
+            hubGrad.addColorStop(1, '#0e0a1b');
+            ctx.fillStyle = hubGrad;
+            ctx.strokeStyle = '#3d3164';
+            ctx.lineWidth = 4;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(center, center, 39, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
+        // Fetch location and load restaurants
+        fetchBtn.addEventListener('click', () => {
+            const workerUrl = workerUrlInput.value.trim();
+            if (!workerUrl) {
+                showToast('Please enter your Cloudflare Worker URL in the settings panel first.', 'warning');
+                return;
+            }
+
+            // Reset frontend state
+            fetchBtn.disabled = true;
+            statusBox.style.display = 'flex';
+            statusText.textContent = 'Acquiring geolocation details...';
+            restaurantsList.innerHTML = '';
+            restaurantCount.textContent = '0';
+            restaurants = [];
+            drawWheel();
+            spinBtn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Convert miles to meters (1 mile = 1609.34 meters)
+                    const radiusMeters = Math.round(radiusSlider.value * 1609.34);
+
+                    statusText.textContent = 'Connecting to Cloudflare Worker...';
+
+                    try {
+                        const baseUrl = workerUrl.endsWith('/') ? workerUrl : `${workerUrl}/`;
+                        const fetchUrl = `${baseUrl}?lat=${lat}&lng=${lng}&radius=${radiusMeters}`;
+                        
+                        const response = await fetch(fetchUrl);
+
+                        if (!response.ok) {
+                            const errorPayload = await response.json().catch(() => ({}));
+                            throw new Error(errorPayload.error || `Server HTTP Error: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+
+                        if (!data.results || !Array.isArray(data.results)) {
+                            throw new Error('Unexpected response structure from Google Places API.');
+                        }
+
+                        // Filter businesses with rating count >= 5 to bypass spam/ghost locations
+                        const validRestaurants = data.results.filter(b => (b.user_ratings_total || 0) >= 5);
+
+                        // Skips wheel animation if no restaurants match, displays CSS toast alert
+                        if (validRestaurants.length === 0) {
+                            showToast('No restaurants match your filters! Try widening your search area.', 'warning');
+                            statusBox.style.display = 'none';
+                            fetchBtn.disabled = false;
+                            return;
+                        }
+
+                        // Limit to maximum 12 items for wheel readability
+                        restaurants = validRestaurants.slice(0, 12);
+                        restaurantCount.textContent = restaurants.length;
+
+                        // Render side list items
+                        restaurants.forEach(r => {
+                            const li = document.createElement('li');
+                            
+                            const nameSpan = document.createElement('span');
+                            nameSpan.className = 'name';
+                            nameSpan.textContent = r.name;
+                            
+                            const ratingSpan = document.createElement('span');
+                            ratingSpan.className = 'rating';
+                            ratingSpan.textContent = `★ ${(r.rating || 0).toFixed(1)}`;
+                            
+                            li.appendChild(nameSpan);
+                            li.appendChild(ratingSpan);
+                            restaurantsList.appendChild(li);
+                        });
+
+                        showToast(`Successfully loaded ${restaurants.length} restaurants!`, 'info');
+                        
+                        drawWheel();
+                        spinBtn.disabled = false;
+
+                    } catch (error) {
+                        console.error(error);
+                        showToast(`Failed loading data: ${error.message}`, 'warning');
+                    } finally {
+                        statusBox.style.display = 'none';
+                        fetchBtn.disabled = false;
+                    }
+                },
+                (locationError) => {
+                    console.error(locationError);
+                    let message = 'Unable to determine coordinates.';
+                    if (locationError.code === locationError.PERMISSION_DENIED) {
+                        message = 'Location access was denied. Please grant geolocation permissions.';
+                    }
+                    showToast(message, 'warning');
+                    statusBox.style.display = 'none';
+                    fetchBtn.disabled = false;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 8000,
+                    maximumAge: 0
+                }
+            );
+        });
+
+        // Smooth physics-based deceleration loop
+        function animateWheel() {
+            if (!isSpinning) return;
+
+            currentAngle += spinVelocity;
+            currentAngle = currentAngle % (2 * Math.PI); // keep bound
+            
+            // Decelerate velocity smoothly
+            spinVelocity *= friction;
+
+            drawWheel();
+
+            // Check if rotation has near-ceased
+            if (spinVelocity < 0.0012) {
+                isSpinning = false;
+                cancelAnimationFrame(animationFrameId);
+                spinVelocity = 0;
+                
+                // Final alignment redraw
+                drawWheel();
+                
+                // Trigger results
+                displayWinningRestaurant();
+            } else {
+                animationFrameId = requestAnimationFrame(animateWheel);
+            }
+        }
+
+        // Initialize rotational velocity and run loop
+        spinBtn.addEventListener('click', () => {
+            if (isSpinning || restaurants.length === 0) return;
+
+            spinBtn.disabled = true;
+            document.querySelector('.wheel-container').classList.add('spinning');
+
+            // Apply high initial velocity between 0.36 and 0.54 rads per frame
+            spinVelocity = 0.36 + Math.random() * 0.18;
+            isSpinning = true;
+
+            animateWheel();
+        });
+
+        // Retrieve and highlight winner in modal card
+        function displayWinningRestaurant() {
+            document.querySelector('.wheel-container').classList.remove('spinning');
+            spinBtn.disabled = false;
+
+            const total = restaurants.length;
+            const segmentSize = (2 * Math.PI) / total;
+
+            // Normalize angle
+            let normalizedAngle = currentAngle % (2 * Math.PI);
+            if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+
+            // Compute pointer target slice (Pointer at 270deg / 1.5 * Math.PI)
+            const pointerAngle = 1.5 * Math.PI;
+            let targetAngle = (pointerAngle - normalizedAngle) % (2 * Math.PI);
+            if (targetAngle < 0) targetAngle += 2 * Math.PI;
+
+            const winningIndex = Math.floor(targetAngle / segmentSize);
+            const winner = restaurants[winningIndex];
+
+            if (!winner) return;
+
+            // Populate Modal Fields
+            modalTitle.textContent = winner.name;
+            modalStars.textContent = getStarsText(winner.rating || 0);
+            modalReviews.textContent = `(${winner.user_ratings_total || 0} reviews)`;
+
+            // Format address
+            const addressText = winner.vicinity || 'Address unavailable';
+            modalAddress.textContent = addressText;
+
+            // Note: Google Nearby Search returns simple records without phone.
+            // Map Link query uses place ID to provide full Google details (including phone, website, reviews) natively!
+            modalPhone.textContent = 'View on Google Maps';
+
+            // Price indicator tag
+            const priceLevel = winner.price_level;
+            modalPrice.textContent = priceLevel ? '$'.repeat(priceLevel) : 'N/A';
+
+            // Category classification
+            let categoryName = 'Restaurant';
+            if (winner.types && winner.types.length > 0) {
+                const filteredTypes = winner.types.filter(t => t !== 'food' && t !== 'point_of_interest' && t !== 'establishment');
+                if (filteredTypes.length > 0) {
+                    categoryName = filteredTypes[0].replace(/_/g, ' ');
+                    categoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+                }
+            }
+            modalCategory.textContent = categoryName;
+
+            // Format direct query for native Google Maps CTA using Place ID for absolute precision!
+            const queryUrl = encodeURIComponent(`${winner.name} ${addressText}`);
+            modalMapsLink.href = `https://www.google.com/maps/search/?api=1&query=${queryUrl}&query_place_id=${winner.place_id}`;
+
+            // Scale modal open
+            resultModal.classList.add('active');
+        }
+
+        // Convert decimal ratings to styled glyph combinations
+        function getStarsText(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = (rating % 1 >= 0.5) ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStar;
+            return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(emptyStars);
+        }
+
+        // Close modal actions
+        modalCloseBtn.addEventListener('click', () => {
+            resultModal.classList.remove('active');
+        });
+
+        // Backdrop click to close
+        resultModal.addEventListener('click', (e) => {
+            if (e.target === resultModal) {
+                resultModal.classList.remove('active');
+            }
+        });
+
+        // Initialize Canvas layout parameters on window load
+        window.addEventListener('load', setupCanvas);
+    </script>
+</body>
 </html>
